@@ -11,8 +11,9 @@ function App() {
   const [plan, setPlan] = useState([]);  // New state variable for the learning plan
   const handleSubmit = async event => {
     event.preventDefault();
-    
-    const prompt = `Create a 5-step learning plan to learn ${input}. Give the plan in an array of objects format with step name and content. Do not include anything but the array of objects itself. Format should be following: {
+
+    const apiUrl = 'http://localhost:5000/api/completion';
+    const data = { prompt: `Create a 5-step learning plan to learn ${input}. Give the plan in an array of objects format with step name and content. Do not include anything but the array of objects itself. Format should be following: {
       "steps": [
         {
           "stepName": "Step 1",
@@ -25,26 +26,15 @@ function App() {
         // and so on...
       ]
     }
-    `;
-    const maxTokens = 500;
-    const model = "text-davinci-003";
-
-    const apiUrl = 'https://api.openai.com/v1/completions';
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`
-    };
-    const data = {
-      model: model,
-      prompt: prompt,
-      max_tokens: maxTokens
+    `
     };
     
     try {
-      const response = await axios.post(apiUrl, data, { headers });
+      const response = await axios.post(apiUrl, data);
       
     // Parsing the response string into JSON and then setting the plan state
-    const parsedResponse = JSON.parse(response.data.choices[0].text.trim());
+    const parsedResponse = JSON.parse(response.data.trim());
+    console.log(response.data);
     setPlan(parsedResponse.steps); 
     } catch (error) {
       console.error('Error making API request: ', error);
